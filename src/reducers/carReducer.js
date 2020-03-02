@@ -16,6 +16,50 @@ export const initalState = {
 
 export const carReducer = (state=initalState, action) => {
     switch(action.type) {
+        case "ADD_FEATURE":
+            //  Populate feature object from payload
+            const newFeature = {
+                id: action.payload.id,
+                name: action.payload.name,
+                price: action.payload.price
+            }
+
+            //  Remove add features with the payload id
+            const features = [
+                ...state.car.features,
+                newFeature
+            ]
+
+            //  Calc new additionalPrice by adding all features
+            const newAdditionalPrice = features.reduce(total, feature) => total + feature.price;
+
+            //  Add feature to features object
+            return {
+                ...state,
+                additionalPrice: newAdditionalPrice,
+                car: {
+                    features: features
+                }
+            }
+
+        case "REMOVE_FEATURE":
+            //  Feature id to remove
+            const id = action.payload.id;
+
+            //  Remove add features with the payload id
+            const features = state.car.features.filter((feature, key) => feature.id !== id);
+
+            //  Calc new additionalPrice by adding all features
+            const newAdditionalPrice = features.reduce(total, feature) => total + feature.price;
+
+            return {
+                ...state,
+                additionalPrice: newAdditionalPrice,
+                car: {
+                    features: features
+                }
+            }
+
         default:
             return state;
     }
