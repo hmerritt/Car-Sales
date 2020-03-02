@@ -1,3 +1,5 @@
+import { sumBy, findIndex } from "lodash";
+
 export const initalState = {
     additionalPrice: 0,
     car: {
@@ -24,21 +26,29 @@ export const carReducer = (state=initalState, action) => {
                 price: action.payload.price
             }
 
-            //  Remove add features with the payload id
-            const features = [
+            //  Add new feature to list of features
+            let features_add = [
                 ...state.car.features,
                 newFeature
-            ]
+            ];
+
+            //  Check if feature has already been added
+            if (findIndex(state.car.features, {id: newFeature.id}) > -1) {
+                features_add = [
+                    ...state.car.features
+                ];
+            }
 
             //  Calc new additionalPrice by adding all features
-            const newAdditionalPrice = features.reduce(total, feature) => total + feature.price;
+            const newAdditionalPrice_add = sumBy(features_add, "price");
 
             //  Add feature to features object
             return {
                 ...state,
-                additionalPrice: newAdditionalPrice,
+                additionalPrice: newAdditionalPrice_add,
                 car: {
-                    features: features
+                    ...state.car,
+                    features: features_add
                 }
             }
 
@@ -46,17 +56,18 @@ export const carReducer = (state=initalState, action) => {
             //  Feature id to remove
             const id = action.payload.id;
 
-            //  Remove add features with the payload id
-            const features = state.car.features.filter((feature, key) => feature.id !== id);
+            //  Remove feature with the payload id
+            const features_remove = state.car.features.filter((feature, key) => feature.id !== id);
 
             //  Calc new additionalPrice by adding all features
-            const newAdditionalPrice = features.reduce(total, feature) => total + feature.price;
+            const newAdditionalPrice_remove = sumBy(features_remove, "price");
 
             return {
                 ...state,
-                additionalPrice: newAdditionalPrice,
+                additionalPrice: newAdditionalPrice_remove,
                 car: {
-                    features: features
+                    ...state.car,
+                    features: features_remove
                 }
             }
 
